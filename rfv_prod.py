@@ -76,7 +76,6 @@ df = df[(df['pedido_data'] >= pd.to_datetime(data_inicio)) & (df['pedido_data'] 
 # Calcular e segmentar RFV
 df_rfv = calcular_rfv(df)
 df_rfv = segmentar_rfv(df_rfv)
-df_rfv.to_excel('segmentacao_rfv.xlsx', index=False)
 
 # Adiciona nome e email ao DataFrame segmentado
 df_rfv = df_rfv.merge(
