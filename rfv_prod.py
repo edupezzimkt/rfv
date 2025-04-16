@@ -29,9 +29,6 @@ if df is not None:
 else:
     st.warning("Por favor, faça o upload de um arquivo CSV para continuar.")
 
-st.set_page_config(layout="wide")
-st.title("\U0001F4CA Dashboard RFV de Clientes Jolimont")
-
 # Função para cálculo de RFV
 def calcular_rfv(df):
     snapshot_date = df['pedido_data'].max() + pd.Timedelta(days=1)
