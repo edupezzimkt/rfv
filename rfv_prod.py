@@ -15,8 +15,6 @@ df = st.file_uploader("📂 Faça o upload do arquivo CSV de pedidos", type=["cs
 
 if df is not None:
     df = pd.read_csv(df, parse_dates=['pedido_data'])  # certifique-se que a coluna 'pedido_data' está presente
-else:
-    st.warning("Por favor, faça o upload de um arquivo CSV para continuar.")
 
     # Conversão de tipos
     df['item_quantidade'] = pd.to_numeric(df['item_quantidade'], errors='coerce').fillna(0).astype(int)
@@ -28,6 +26,8 @@ else:
     # Remover duplicatas
     df.drop_duplicates(subset=['cpf_cnpj', 'pedido_numero'], keep='last', inplace=True)
 
+else:
+    st.warning("Por favor, faça o upload de um arquivo CSV para continuar.")
 
 st.set_page_config(layout="wide")
 st.title("\U0001F4CA Dashboard RFV de Clientes Jolimont")
