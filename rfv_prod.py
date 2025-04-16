@@ -8,26 +8,48 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 st.set_page_config(layout="wide")
-st.title("📊 Dashboard RFV de Clientes Spazzio")
+st.title("📊 Dashboard RFV de Clientes Jolimont")
 
-# Upload do arquivo
-df = st.file_uploader("📂 Faça o upload do arquivo CSV de pedidos", type=["csv"])
+# Upload do CSV
+arquivo_csv = st.file_uploader("📂 Faça o upload do arquivo CSV de pedidos", type=["csv"])
 
-if df is not None:
-    df = pd.read_csv(df, parse_dates=['pedido_data'])  # certifique-se que a coluna 'pedido_data' está presente
+if arquivo_csv is not None:
+    # ---------------------
+    # 1. Carregar os dados
+    # ---------------------
+    df = pd.read_csv(arquivo_csv, parse_dates=['pedido_data'])
 
-    # Conversão de tipos
+    # Tratamento dos dados
     df['item_quantidade'] = pd.to_numeric(df['item_quantidade'], errors='coerce').fillna(0).astype(int)
     df['pedido_descontos'] = pd.to_numeric(df['pedido_descontos'], errors='coerce')
     df['item_valor_unidade'] = pd.to_numeric(df['item_valor_unidade'], errors='coerce')
     df['pedido_valor_frete'] = pd.to_numeric(df['pedido_valor_frete'], errors='coerce')
     df['valor_total_pedido'] = pd.to_numeric(df['valor_total_pedido'], errors='coerce')
 
-    # Remover duplicatas
     df.drop_duplicates(subset=['cpf_cnpj', 'pedido_numero'], keep='last', inplace=True)
 
+    # -----------------------------------
+    # 2. Todo o resto do seu dashboard...
+    # -----------------------------------
+
+    # Data range picker
+    min_data, max_data = df['pedido_data'].min(), df['pedido_data'].max()
+    data_inicio, data_fim = st.date_input(
+        "📅 Selecione o período de pedidos:",
+        [min_data, max_data],
+        format="DD/MM/YYYY"
+    )
+    
+    df = df[(df['pedido_data'] >= pd.to_datetime(data_inicio)) & (df['pedido_data'] <= pd.to_datetime(data_fim))]
+
+    # Suas funções: calcular_rfv, segmentar_rfv...
+    # Seus gráficos, tabelas etc.
+
 else:
-    st.warning("Por favor, faça o upload de um arquivo CSV para continuar.")
+    st.warning("📂 Por favor, faça o upload de um arquivo CSV para continuar.")
+
+st.set_page_config(layout="wide")
+st.title("\U0001F4CA Dashboard RFV de Clientes Jolimont")
 
 # Função para cálculo de RFV
 def calcular_rfv(df):
@@ -76,6 +98,7 @@ df = df[(df['pedido_data'] >= pd.to_datetime(data_inicio)) & (df['pedido_data'] 
 # Calcular e segmentar RFV
 df_rfv = calcular_rfv(df)
 df_rfv = segmentar_rfv(df_rfv)
+df_rfv.to_excel('segmentacao_rfv.xlsx', index=False)
 
 # Adiciona nome e email ao DataFrame segmentado
 df_rfv = df_rfv.merge(
